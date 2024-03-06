@@ -1,0 +1,472 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schemas.stacspec.org/2.0.0.alpha.0/extensions/ml-model/json-schema/schema.json",
+  "title": "ML Model Item",
+  "description": "This object represents the metadata for a Machine Learning (ML) model item in a ML Catalog.",
+  "allOf": [
+    {
+      "$ref": "https://schemas.stacspec.org/v1.0.0/item-spec/json-schema/item.json"
+    },
+    {
+      "$ref": "#/definitions/ml-model"
+    },
+    {
+      "$ref": "#/definitions/mlm:properties"
+    }
+  ],
+  "definitions": {
+    "ml-model": {
+      "type": "object",
+      "required": [
+        "stac_extensions",
+        "properties",
+        "assets"
+      ],
+      "properties": {
+        "stac_extensions": {
+          "type": "object",
+          "required": [
+            "stac_extensions"
+          ],
+          "properties": {
+            "stac_extensions": {
+              "type": "array",
+              "contains": {
+                "enum": [
+                  "ml-model",
+                  "https://schemas.stacspec.org/2.0.0.alpha.0/extensions/ml-model/json-schema/schema.json"
+                ]
+              }
+            }
+          }
+        },
+        "properties": {
+          "type": "object",
+          "required": [
+            "mlm:name",
+            "mlm:task",
+            "mlm:framework",
+            "mlm:framework_version",
+            "mlm:file_size",
+            "mlm:memory_size",
+            "mlm:input",
+            "mlm:output",
+            "mlm:runtime"
+          ],
+          "properties": {
+            "mlm:name": {
+              "$ref": "#/definitions/mlm:name"
+            },
+            "mlm:task": {
+              "$ref": "#/definitions/mlm:task"
+            },
+            "mlm:framework": {
+              "$ref": "#/definitions/mlm:framework"
+            },
+            "mlm:framework_version": {
+              "$ref": "#/definitions/mlm:framework_version"
+            },
+            "mlm:file_size": {
+              "$ref": "#/definitions/mlm:file_size"
+            },
+            "mlm:memory_size": {
+              "$ref": "#/definitions/mlm:memory_size"
+            },
+            "mlm:input": {
+              "$ref": "#/definitions/mlm:input"
+            },
+            "mlm:output": {
+              "$ref": "#/definitions/mlm:output"
+            },
+            "mlm:runtime": {
+              "$ref": "#/definitions/mlm:runtime"
+            }
+          }
+        }
+      },
+      "patternProperties": {
+        "^(?!mlm:)": {}
+      },
+      "additionalProperties": false
+    },
+    "mlm:name": {
+      "title": "ML model name",
+      "description": "A unique name for the model",
+      "type": "string"
+    },
+    "mlm:task": {
+      "title": "Target ML task",
+      "description": "Primary ML task for which the output can be used for",
+      "type": "string",
+      "enum": [
+        "regression",
+        "classification",
+        "object detection",
+        "semantic segmentation",
+        "instance segmentation",
+        "panoptic segmentation",
+        "multi-modal",
+        "similarity search",
+        "image captioning",
+        "generative",
+        "super resolution"
+      ]
+    },
+    "mlm:framework": {
+      "title": "ML framework",
+      "description": "Framework used to train the model (ex: PyTorch, TensorFlow)",
+      "type": "string"
+    },
+    "mlm:framework_version": {
+      "title": "ML framework version",
+      "description": "The recommended library version for ML framework",
+      "type": "string"
+    },
+    "mlm:file_size": {
+      "title": "File size on disk",
+      "description": "The size on disk of the model artifact (bytes)",
+      "type": "integer"
+    },
+    "mlm:memory_size": {
+      "title": "In-memory size",
+      "description": "The in-memory model size on the accelerator during inference (bytes)",
+      "type": "integer"
+    },
+    "mlm:input": {
+      "title": "Description of the input variable",
+      "type": "object",
+      "description": "Describes the transformation between the EO data and the model input",
+      "required": [
+        "name",
+        "bands",
+        "input_array"
+      ],
+      "properties": {
+        "name": {
+          "title": "Informative name of the input variable",
+          "type": "string"
+        },
+        "bands": {
+          "title": "Name of input raster bands",
+          "description": "May be all or a subset of bands in Band Object STAC item",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "title": "Band name",
+            "type": "string"
+          }
+        },
+        "input_array": {
+          "title": "Description of the input array",
+          "type": "object",
+          "description": "Array object that describes the shape, dimension ordering, and data type",
+          "required": [
+            "shape",
+            "dim_order",
+            "data_type"
+          ],
+          "properties": {
+            "shape": {
+              "title": "Shape of the N-dimensional array",
+              "description": "The shape should include the batch size, e.g. B x C x H x W",
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "integer"
+              }
+            },
+            "dim_order": {
+              "title": "Order of dimensions",
+              "description": "Examples include 'bhw', 'bchw', 'bthwc' where b=batch, t=time, c=channel, h=height, w=width",
+              "type": "string"
+            },
+            "data_type": {
+              "title": "Numerical type of the array",
+              "type": "string",
+              "enum": [
+                "int8",
+                "int16",
+                "int32",
+                "int64",
+                "uint8",
+                "uint16",
+                "uint32",
+                "uint64",
+                "float16",
+                "float32",
+                "float64"
+              ]
+            }
+          }
+        },
+        "parameters": {
+          "title": "Mapping with names for the parameters and their values",
+          "type": "object",
+          "": [] //?
+        },
+        "norm_by_channel": {
+          "title": "Normalize by channel-wise statistics or global statistics",
+          "type": "boolean"
+        },
+        "norm_type": {
+          "title": "Normalization method",
+          "type": "string",
+          "enum": [
+            "min_max",
+            "z_score",
+            "max_norm",
+            "mean_norm",
+            "unit_variance",
+            "norm_with_clip",
+            "none"
+          ]
+        },
+        "resize_type": {
+          "title": "Rescaling method",
+          "type": "string",
+          "enum": [
+            "crop",
+            "pad",
+            "interpolation",
+            "none"
+          ]
+        },
+        "statistics": { //?
+          "title": "Statistical standard-deviation",
+          "type": "object"
+        },
+        "norm_with_clip_values": {
+          "title": "Array for normalization for 'norm_with_clip'",
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "pre_processing_function": {
+          "title": "url to the preprocessing function",
+          "type": "string"
+        }
+      }
+    },
+    "mlm:output": {
+      "title": "Description of the output variable",
+      "type": "object",
+      "description": "Describes each model output and how to interpret it",
+      "required": [
+        "task"
+      ],
+      "properties": {
+        "task": {
+          "title": "Task name",
+          "type": "string", // should be an array for multi-task models
+          "enum": [
+            "regression",
+            "classification",
+            "object detection",
+            "semantic segmentation",
+            "instance segmentation",
+            "panoptic segmentation",
+            "multi-modal",
+            "similarity search",
+            "image captioning",
+            "generative",
+            "super resolution"
+          ]
+        },
+        "result": {
+          "title": "The list of output array/tensor from the model",
+          "type": "array",
+          "minItems": 1,
+          "item": {
+            "title": "Output array", // can be same as array object
+            "type": "object",
+            "required": [
+              "shape",
+              "dim_name",
+              "data_type"
+            ],
+            "properties": {
+              "shape": {
+                "title": "Shape of the N-dimensional array",
+                "description": "The shape should include the batch size, e.g. B x C x H x W",
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "dim_name": {
+                "title": "Name of dimensions",
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "data_type": {
+                "title": "Numerical type of the array",
+                "type": "string",
+                "enum": [
+                  "int8",
+                  "int16",
+                  "int32",
+                  "int64",
+                  "uint8",
+                  "uint16",
+                  "uint32",
+                  "uint64",
+                  "float16",
+                  "float32",
+                  "float64"
+                ]
+              }
+            }
+          }
+        },
+        "classification:classes": {
+          "title": "A list of class objects adhering to the Classification extension",
+          "type": "array",
+          "items": {
+            "title": "Description of class",
+            "type": "object",
+            "properties": { // how to do this?
+              "$ref": "https://stac-extensions.github.io/classification/v1.1.0/schema.json#"
+            }
+          }
+        },
+        "post_processing_function": {
+          "title": "Name of the post-processing function",
+          "description": "A url or code path to the postprocessing function ",
+          "type": "string"
+        }
+      }
+    },
+    "mlm:runtime": {
+      "title": "Runtime inference environment",
+      "description": "Describe the environment and assets for inference",
+      "type": "object",
+      "required": [
+        "model_asset",
+        "source_code",
+        "accelerator",
+        "accelerator_constrained",
+        "hardware_summary"
+      ],
+      "recommended": [
+        "container"
+      ],
+      "properties": {
+        "model_asset": {
+          "title": "Model asset",
+          "type": "object", // this should be taken from somewhere else ? which operators go in here?
+          "required": [
+            "href"
+          ],
+          "properties": {
+            "href": {
+              "title": "Link to model asset",
+              "description": "Asset object containing URI to the model file",
+              "type": "string"
+            }
+          }
+        },
+        "source_code": {
+          "title": "Source code description",
+          "type": "object", // this should be taken from somewhere else ? which operators go in here?
+          "required": [
+            "href"
+          ],
+          "properties": {
+            "href": {
+              "title": "Link to code source",
+              "description": "Can describe a github repo, zip archive, etc.",
+              "type": "string"
+            }
+          }
+        },
+        "accelerator": {
+          "title": "Model handling function",
+          "description": "The intended computational hardware that runs inference",
+          "type": "string",
+          "enum": [
+            "amd64",
+            "cuda",
+            "xla",
+            "amd-rocm",
+            "intel-ipex-cpu",
+            "intel-ipex-gpu",
+            "macos-arm"
+          ]
+        },
+        "accelerator_constrained": {
+          "title": "Whether inference can be run only on specified accelerator",
+          "description": "True if only specified accelerator can be used, False otherwise",
+          "type": "boolean"
+        },
+        "hardware_summary": {
+          "title": "High level description of hardware specifics relevant for inference",
+          "type": "string"
+        },
+        "container": {
+          "title": "Description for running in container",
+          "type": "object",
+          "properties": {
+            "container_file": {
+              "title": "Url of the container file (Dockerfile)",
+              "type": "string"
+            },
+            "image_name": {
+              "title": "Name of the container image",
+              "type": "string"
+            },
+            "tag": {
+              "title": "Tag of the image",
+              "type": "string"
+            },
+            "working_dir": {
+              "title": "Working directory in the instance that can be mapped",
+              "type": "string"
+            },
+            "run": {
+              "title": "Running command",
+              "type": "string"
+            }
+          }
+        },
+        "commit_hash": {
+          "title": "Hash value pointing to a specific version of the code",
+          "type": "string"
+        },
+        "batch_size_suggestion": {
+          "title": "Suggested batch size for given accelerator",
+          "type": "integer"
+        }
+      }
+    },
+    "mlm:properties": { // TODO: update/change these
+      "type": "object",
+      "required": [
+        "properties"
+      ],
+      "properties": {
+        "properties": {
+          "$comment": "Optional metadata that provides more details about provenance.",
+          "": [
+            {
+              "$ref": "https://schemas.stacspec.org/v1.0.0-beta.2/item-spec/json-schema/instrument.json"
+            },
+            {
+              "$ref": "https://schemas.stacspec.org/v1.0.0-beta.2/item-spec/json-schema/licensing.json"
+            },
+            {
+              "$ref": "https://schemas.stacspec.org/v1.0.0-beta.2/item-spec/json-schema/provider.json"
+            },
+            {
+              "$ref": "https://schemas.stacspec.org/v1.0.0-beta.2/item-spec/json-schema/datetime.json"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
